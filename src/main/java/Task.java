@@ -1,10 +1,12 @@
+import java.util.Objects;
+
 public class Task {
-    private String description;
-    private boolean isDone;
+    protected String description;
+    protected boolean isDone;
 
     public Task(String description) {
         this.description = description;
-        this.isDone = false;
+        isDone = false;
     }
 
     public String getDescription() {
@@ -32,10 +34,24 @@ public class Task {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null) {
+            return false;
+        }
+
+        if (!(o instanceof Task other)) {
+            return false;
+        }
+
+        return Objects.equals(this.description, other.description) && this.isDone == other.isDone;
+    }
+
+    @Override
     public String toString() {
-        return "Task{" +
-                "description='" + description + '\'' +
-                ", isDone=" + isDone +
-                '}';
+        return "[" + getStatusIcon() + "] " + description;
     }
 }
