@@ -10,13 +10,14 @@ What would you like to do today?
 
         To add a new todo, deadline  or event, enter:
         - 'todo [task name]'
-        - 'deadline [task name] /by [task's deadline]'
-        - 'event [task name] /from [event start] /to [event end]'
+        - 'deadline [task name] /by [date/time]'
+        - 'event [task name] /from [date/time] /to [date/time]'
 
         To show the current task list, enter 'list'.
-        To mark a task as done, enter 'mark [task number]'.
-        To unmark a task, enter 'unmark [task number]'.
+        To mark a task as done, enter 'mark [task list number]'.
+        To unmark a task, enter 'unmark [task list number]'.
         Enter 'bye' to leave.
+
 ---------------------------------------------------------
 
 ---------------------------------------------------------
