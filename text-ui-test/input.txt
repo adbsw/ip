@@ -1,0 +1,25 @@
+todo task 1
+deadline task 2 /by time
+event task 3 /from time 1 /to time 2
+list
+todo task 1
+deadline task 2 /by time
+event task 3 /from time 1 /to time 2
+mark 0
+mark 4
+mark 1
+list
+mark 1
+unmark 1
+list
+not valid text
+todo
+deadline
+event
+mark
+unmark
+deadline task 4      /by            spaces
+list
+event task 5 /from       spaces        /to         more     spaces
+list
+bye
