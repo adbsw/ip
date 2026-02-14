@@ -12,12 +12,14 @@ list
 mark 1
 unmark 1
 list
-not valid text
+invalid request
 todo
 deadline
+deadline missing due time
 event
+event missing time frame
 mark
-unmark
+unmark notANumber
 deadline task 4      /by            spaces
 list
 event task 5 /from       spaces        /to         more     spaces
