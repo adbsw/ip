@@ -4,7 +4,7 @@ public class Green {
     private static final int ARRAY_SIZE = 100;
     private static Task[] tasks = new Task[ARRAY_SIZE];
     private static int taskCount = 0;
-    private static final String LINE_DIVIDER = "---------------------------------------------------------";
+    private static final String LINE_DIVIDER = "--------------------------------------------------------------";
     private static final String OPENING = LINE_DIVIDER + System.lineSeparator();
     private static final String CLOSING = System.lineSeparator() + LINE_DIVIDER + System.lineSeparator();
 
@@ -165,7 +165,15 @@ public class Green {
                 break;
             case "mark":
             case "unmark":
-                int listNum = Integer.parseInt(task.getDescription());
+                int listNum;
+                try {
+                    listNum = Integer.parseInt(task.getDescription());
+                } catch (NumberFormatException e) {
+                    System.out.println( OPENING
+                            + "You need to indicate a task by its list number to mark/unmark."
+                            + CLOSING);
+                    break;
+                }
                 changeTaskStatus(listNum, command.equals("mark"));
                 break;
             case "list":
@@ -175,7 +183,8 @@ public class Green {
                 byeFlag = true;
                 System.out.println(OPENING + "Goodbye, have a nice day." + CLOSING);
                 break;
-            default: System.out.println(OPENING + "Not sure what you mean." + CLOSING);
+            default:
+                System.out.println(OPENING + "Not sure what you mean." + CLOSING);
             }
         }
     }
