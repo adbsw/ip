@@ -1,4 +1,11 @@
+package green.ui;
+
 import java.util.Scanner;
+
+import green.task.Deadline;
+import green.task.Event;
+import green.task.Task;
+import green.task.ToDo;
 
 public class Green {
     private static final int ARRAY_SIZE = 100;
