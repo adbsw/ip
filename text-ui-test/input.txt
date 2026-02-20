@@ -24,4 +24,10 @@ deadline task 4      /by            spaces
 list
 event task 5 /from       spaces        /to         more     spaces
 list
+delete 1
+list
+delete 2
+list
+delete 2
+list
 bye
