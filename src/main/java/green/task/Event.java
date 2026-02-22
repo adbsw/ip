@@ -52,4 +52,8 @@ public class Event extends Task {
         return "[E]" + super.toString() + " (from: " + from + ", to: " + to + ")";
     }
 
+    @Override
+    public String stringToFile() {
+        return "E | " + super.stringToFile() + " | " + from + " | " + to;
+    }
 }
