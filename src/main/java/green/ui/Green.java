@@ -1,6 +1,21 @@
 package green.ui;
 
+
 import java.util.ArrayList;
+
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
+
 import java.util.Scanner;
 
 import green.task.Deadline;
@@ -13,6 +28,55 @@ public class Green {
     private static final String LINE_DIVIDER = "--------------------------------------------------------------";
     private static final String OPENING = LINE_DIVIDER + System.lineSeparator();
     private static final String CLOSING = System.lineSeparator() + LINE_DIVIDER + System.lineSeparator();
+
+    private static void printFileContents(String filePath) throws FileNotFoundException {
+        File f = new File(filePath); // create a File for the given file path
+        Scanner s = new Scanner(f); // create a Scanner using the File as the source
+        while (s.hasNext()) {
+            String[] details = s.nextLine().split("\\|");
+            String type = details[0].trim();
+            String status = details[1].trim();
+            String description = details[2].trim();
+            Task task = new Task(description);
+            switch (type) {
+            case "T":
+                task = new ToDo(description);
+                break;
+            case "D":
+                String by = details[3].trim();
+                task = new Deadline(description, by);
+                break;
+            case "E":
+                String from = details[3].trim();
+                String to = details[4].trim();
+                task = new Event(description, from, to);
+                break;
+            default:
+                break;
+            }
+            tasks.add(task);
+            task.setDone(Objects.equals(status, "✓"));
+        }
+        s.close();
+        showList();
+    }
+
+    private static void writeToFile(String filePath) throws IOException {
+        FileWriter fw = new FileWriter(filePath);
+        for (int i = 0; i < tasks.size(); i++) {
+            fw.write(tasks.get(i).stringToFile());
+            if (i != tasks.size() - 1) {
+                fw.write(System.lineSeparator());
+            }
+        }
+        fw.close();
+    }
+
+    private static void appendToFile(String filePath, String textToAppend) throws IOException {
+        FileWriter fw = new FileWriter(filePath, true); // create a FileWriter in append mode
+        fw.write(System.lineSeparator() + textToAppend);
+        fw.close();
+    }
 
     /** Adds task to current list */
     public static void addTask(Task newTask) {
@@ -146,6 +210,7 @@ public class Green {
     public static void main(String[] args) {
         String input;
         Scanner in = new Scanner(System.in);
+
         System.out.println(OPENING + "Greetings from");
         String logo =
                 """
@@ -159,18 +224,37 @@ public class Green {
         System.out.println(
                 """
                  What would you like to do today?
-                 
+
                          To add a new todo, deadline  or event, enter:
                          - 'todo [task name]'
                          - 'deadline [task name] /by [date/time]'
                          - 'event [task name] /from [date/time] /to [date/time]'
-                 
+
                          To show the current task list, enter 'list'.
                          To mark a task as done, enter 'mark [task list number]'.
                          To unmark a task, enter 'unmark [task list number]'.
                          Enter 'bye' to leave.
                  """
                  + CLOSING);
+
+        String tempFile = "./temp/tempList.txt";
+
+        Path pathGreen = Paths.get("./data/green.txt");
+        Path pathTemp = Paths.get(tempFile);
+        try {
+            Files.copy(pathGreen, pathTemp, REPLACE_EXISTING);
+        } catch (IOException e) {
+            System.out.println(OPENING + "Copying green.txt to temp file went wrong: " + e.getMessage()
+                    + CLOSING);
+        }
+
+        try {
+            System.out.println(OPENING + "Welcome back");
+            printFileContents(tempFile);
+        } catch (FileNotFoundException e) {
+            System.out.println(OPENING + "File not found" + CLOSING);
+        }
+        
 
         boolean byeFlag = false;
         while (!byeFlag) {
@@ -205,6 +289,17 @@ public class Green {
             case "deadline":
             case "event":
                 addTask(task);
+
+                String textToAppend = null;
+                if (task != null) {
+                    textToAppend = task.stringToFile();
+                }
+
+                try {
+                    appendToFile(tempFile,textToAppend);
+                } catch (IOException e) {
+                    System.out.println(OPENING + "Appending went wrong: " + e.getMessage() + CLOSING);
+                }
                 break;
             case "delete":
                 deleteTask(task);
@@ -212,13 +307,43 @@ public class Green {
             case "mark":
             case "unmark":
                 changeTaskStatus(task, request.equals("mark"));
+
+                try {
+                    writeToFile(tempFile);
+                } catch (IOException e) {
+                    System.out.println(OPENING + "Writing went wrong: " + e.getMessage() + CLOSING);
+                }
                 break;
             case "list":
                 showList();
                 break;
             case "bye":
-                byeFlag = true;
                 System.out.println(OPENING + "Goodbye, have a nice day." + CLOSING);
+                try {
+                    Files.copy(pathTemp, pathGreen, REPLACE_EXISTING);
+                } catch (IOException e) {
+                    System.out.println(OPENING + "Copying temp file to green.txt went wrong: " + e.getMessage()
+                            + CLOSING);
+                    break;
+                }
+
+                try {
+                    Files.delete(pathTemp);
+                } catch (NoSuchFileException e) {
+                    System.out.println(OPENING + "No such file found: " + e.getMessage() + CLOSING);
+                    break;
+                } catch (DirectoryNotEmptyException e) {
+                    System.out.println(OPENING + "Directory not empty: " + e.getMessage() + CLOSING);
+                    break;
+                } catch (IOException e) {
+                    System.out.println(OPENING + "Something went wrong: " + e.getMessage() + CLOSING);
+                    break;
+                } catch (SecurityException e) {
+                    System.out.println(OPENING + "Insufficient permission to delete file: " + e.getMessage()
+                            + CLOSING);
+                    break;
+                }
+                byeFlag = true;
                 break;
             default:
                 System.out.println(OPENING + "Not sure what you mean." + CLOSING);
