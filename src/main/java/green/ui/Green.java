@@ -28,10 +28,31 @@ public class Green {
     private static final String LINE_DIVIDER = "--------------------------------------------------------------";
     private static final String OPENING = LINE_DIVIDER + System.lineSeparator();
     private static final String CLOSING = System.lineSeparator() + LINE_DIVIDER + System.lineSeparator();
+    private static final String LOGO = """
+                     _____     _____    ____   ____   _    _
+                    |  _ _|   |  _  \\  |  __| |  __| | \\  | |
+                    | |  _ _  | |_| /  |  __| |  __| | |\\ | |
+                    | |_| | | | | \\ \\  |  __| |  __| | | \\| |
+                    |____/ \\_\\\\_|  \\_\\ \\____\\ \\____\\ \\_|  \\_|
+                """;
+    private static final String GREETINGS = """
+                 Welcome. What would you like to do today?
+
+                         To add a new todo, deadline  or event, enter:
+                         - 'todo [task name]'
+                         - 'deadline [task name] /by [date/time]'
+                         - 'event [task name] /from [date/time] /to [date/time]'
+
+                         To show the current task list, enter 'list'.
+                         To mark a task as done, enter 'mark [task list number]'.
+                         To unmark a task, enter 'unmark [task list number]'.
+                         To delete a task, enter 'delete [task list number]'.
+                         Enter 'bye' to leave.
+                 """;
 
     private static void printFileContents(String filePath) throws FileNotFoundException {
-        File f = new File(filePath); // create a File for the given file path
-        Scanner s = new Scanner(f); // create a Scanner using the File as the source
+        File f = new File(filePath);
+        Scanner s = new Scanner(f);
         while (s.hasNext()) {
             String[] details = s.nextLine().split("\\|");
             String type = details[0].trim();
@@ -73,7 +94,7 @@ public class Green {
     }
 
     private static void appendToFile(String filePath, String textToAppend) throws IOException {
-        FileWriter fw = new FileWriter(filePath, true); // create a FileWriter in append mode
+        FileWriter fw = new FileWriter(filePath, true);
         fw.write(System.lineSeparator() + textToAppend);
         fw.close();
     }
@@ -133,6 +154,7 @@ public class Green {
         System.out.println(LINE_DIVIDER + System.lineSeparator());
     }
 
+    /** Returns request word from user input */
     public static String parseRequest(String[] words) throws IllegalArgumentException {
         boolean notKnownRequest = !words[0].equals("todo") && !words[0].equals("deadline")
                 && !words[0].equals("event") && !words[0].equals("delete")
@@ -143,7 +165,8 @@ public class Green {
         }
         return words[0];
     }
-
+    
+    /** Returns details of task depending on task type */
     public static Task getTaskDetails(String request, String words) throws ArrayIndexOutOfBoundsException {
         String[] details = words.trim().split("/");
         String description = details[0].trim();
@@ -170,7 +193,8 @@ public class Green {
         }
     }
 
-    /** Extract and return corresponding details and class of task from user input */
+    /** Checks if request requires user-provided task details, task list number, or none,
+     * and extracts and returns accordingly from user input */
     public static Task parseTask(String request, String[] words) throws ArrayIndexOutOfBoundsException {
         boolean noTaskDescrRequiredRequest = request.equals("list") || request.equals("bye");
         if (noTaskDescrRequiredRequest) {
@@ -212,30 +236,8 @@ public class Green {
         Scanner in = new Scanner(System.in);
 
         System.out.println(OPENING + "Greetings from");
-        String logo =
-                """
-                     _____     _____    ____   ____   _    _
-                    |  _ _|   |  _  \\  |  __| |  __| | \\  | |
-                    | |  _ _  | |_| /  |  __| |  __| | |\\ | |
-                    | |_| | | | | \\ \\  |  __| |  __| | | \\| |
-                    |____/ \\_\\\\_|  \\_\\ \\____\\ \\____\\ \\_|  \\_|
-                """;
-        System.out.println(logo);
-        System.out.println(
-                """
-                 What would you like to do today?
-
-                         To add a new todo, deadline  or event, enter:
-                         - 'todo [task name]'
-                         - 'deadline [task name] /by [date/time]'
-                         - 'event [task name] /from [date/time] /to [date/time]'
-
-                         To show the current task list, enter 'list'.
-                         To mark a task as done, enter 'mark [task list number]'.
-                         To unmark a task, enter 'unmark [task list number]'.
-                         Enter 'bye' to leave.
-                 """
-                 + CLOSING);
+        System.out.println(LOGO);
+        System.out.println(GREETINGS);
 
         String tempFile = "./temp/tempList.txt";
 
@@ -249,15 +251,13 @@ public class Green {
         }
 
         try {
-            System.out.println(OPENING + "Welcome back");
             printFileContents(tempFile);
         } catch (FileNotFoundException e) {
             System.out.println(OPENING + "File not found" + CLOSING);
         }
-        
 
-        boolean byeFlag = false;
-        while (!byeFlag) {
+        boolean isByeRequest = false;
+        while (!isByeRequest) {
             input = in.nextLine();
 
             String[] words = input.trim().split(" ",2);
@@ -303,6 +303,13 @@ public class Green {
                 break;
             case "delete":
                 deleteTask(task);
+
+                try {
+                    writeToFile(tempFile);
+                } catch (IOException e) {
+                    System.out.println(OPENING + "Writing after deletion went wrong: "
+                            + e.getMessage() + CLOSING);
+                }
                 break;
             case "mark":
             case "unmark":
@@ -311,7 +318,8 @@ public class Green {
                 try {
                     writeToFile(tempFile);
                 } catch (IOException e) {
-                    System.out.println(OPENING + "Writing went wrong: " + e.getMessage() + CLOSING);
+                    System.out.println(OPENING + "Writing after changing task status went wrong: "
+                            + e.getMessage() + CLOSING);
                 }
                 break;
             case "list":
@@ -343,7 +351,7 @@ public class Green {
                             + CLOSING);
                     break;
                 }
-                byeFlag = true;
+                isByeRequest = true;
                 break;
             default:
                 System.out.println(OPENING + "Not sure what you mean." + CLOSING);
