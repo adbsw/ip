@@ -6,7 +6,7 @@ Greetings from
     | |_| | | | | \ \  |  __| |  __| | | \| |
     |____/ \_\\_|  \_\ \____\ \____\ \_|  \_|
 
-What would you like to do today?
+Welcome. What would you like to do today?
 
         To add a new todo, deadline  or event, enter:
         - 'todo [task name]'
@@ -16,8 +16,11 @@ What would you like to do today?
         To show the current task list, enter 'list'.
         To mark a task as done, enter 'mark [task list number]'.
         To unmark a task, enter 'unmark [task list number]'.
+        To delete a task, enter 'delete [task list number]'.
         Enter 'bye' to leave.
 
+--------------------------------------------------------------
+Your list is empty.
 --------------------------------------------------------------
 
 --------------------------------------------------------------
@@ -52,11 +55,11 @@ Failed to add 'task 3'. It is already in the list.
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Task list number 0 does not exist.
+Task list number does not exist.
 --------------------------------------------------------------
 
 --------------------------------------------------------------
-Task list number 4 does not exist.
+Task list number does not exist.
 --------------------------------------------------------------
 
 --------------------------------------------------------------
