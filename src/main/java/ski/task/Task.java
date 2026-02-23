@@ -1,4 +1,4 @@
-package green.task;
+package ski.task;
 
 import java.util.Objects;
 

@@ -1,4 +1,4 @@
-package green.task;
+package ski.task;
 
 public class ToDo extends Task {
 

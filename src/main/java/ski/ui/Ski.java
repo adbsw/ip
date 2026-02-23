@@ -1,4 +1,4 @@
-package green.ui;
+package ski.ui;
 
 
 import java.util.ArrayList;
@@ -18,22 +18,22 @@ import java.util.Objects;
 
 import java.util.Scanner;
 
-import green.task.Deadline;
-import green.task.Event;
-import green.task.Task;
-import green.task.ToDo;
+import ski.task.Deadline;
+import ski.task.Event;
+import ski.task.Task;
+import ski.task.ToDo;
 
-public class Green {
+public class Ski {
     private static ArrayList<Task> tasks = new ArrayList<>();
     private static final String LINE_DIVIDER = "--------------------------------------------------------------";
     private static final String OPENING = LINE_DIVIDER + System.lineSeparator();
     private static final String CLOSING = System.lineSeparator() + LINE_DIVIDER + System.lineSeparator();
     private static final String LOGO = """
-                     _____     _____    ____   ____   _    _
-                    |  _ _|   |  _  \\  |  __| |  __| | \\  | |
-                    | |  _ _  | |_| /  |  __| |  __| | |\\ | |
-                    | |_| | | | | \\ \\  |  __| |  __| | | \\| |
-                    \\____/\\_| \\_|  \\_\\ \\____| \\____| \\_|  \\_|
+                     _____   __  __    _____
+                    |  _ _|  | |/ /   |_   _|
+                    |_ _ _   |   /      | |
+                     _ _  |  | |\\ \\   __| |__
+                    |_____|  |_| \\_\\ |_______|
                 """;
     private static final String GREETINGS = """
                  Welcome. What would you like to do today?
@@ -49,6 +49,12 @@ public class Green {
                          To delete a task, enter 'delete [task list number]'.
                          Enter 'bye' to leave.
                  """;
+
+    private static void printGreetings() {
+        System.out.println(OPENING + "Greetings from");
+        System.out.println(LOGO);
+        System.out.println(GREETINGS);
+    }
 
     /** Prints task list from file to terminal */
     private static void printFileContents(String filePath) throws FileNotFoundException {
@@ -232,9 +238,7 @@ public class Green {
         String input;
         Scanner in = new Scanner(System.in);
 
-        System.out.println(OPENING + "Greetings from");
-        System.out.println(LOGO);
-        System.out.println(GREETINGS);
+        printGreetings();
 
         Path pathList = Paths.get("./data/list.txt");
         Path parentDir = pathList.getParent();
