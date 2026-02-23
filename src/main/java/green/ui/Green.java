@@ -33,7 +33,7 @@ public class Green {
                     |  _ _|   |  _  \\  |  __| |  __| | \\  | |
                     | |  _ _  | |_| /  |  __| |  __| | |\\ | |
                     | |_| | | | | \\ \\  |  __| |  __| | | \\| |
-                    |____/ \\_\\\\_|  \\_\\ \\____\\ \\____\\ \\_|  \\_|
+                    \\____/\\_| \\_|  \\_\\ \\____| \\____| \\_|  \\_|
                 """;
     private static final String GREETINGS = """
                  Welcome. What would you like to do today?
@@ -50,6 +50,7 @@ public class Green {
                          Enter 'bye' to leave.
                  """;
 
+    /** Prints task list from file to terminal */
     private static void printFileContents(String filePath) throws FileNotFoundException {
         File f = new File(filePath);
         Scanner s = new Scanner(f);
@@ -76,12 +77,13 @@ public class Green {
                 break;
             }
             tasks.add(task);
-            task.setDone(Objects.equals(status, "✓"));
+            task.setDone(Objects.equals(status, "/"));
         }
         s.close();
         showList();
     }
 
+    /** Writes task list to file */
     private static void writeToFile(String filePath) throws IOException {
         FileWriter fw = new FileWriter(filePath);
         for (int i = 0; i < tasks.size(); i++) {
@@ -90,12 +92,6 @@ public class Green {
                 fw.write(System.lineSeparator());
             }
         }
-        fw.close();
-    }
-
-    private static void appendToFile(String filePath, String textToAppend) throws IOException {
-        FileWriter fw = new FileWriter(filePath, true);
-        fw.write(System.lineSeparator() + textToAppend);
         fw.close();
     }
 
@@ -112,6 +108,7 @@ public class Green {
         System.out.println(OPENING + "'" + newTask.getDescription() + "' has been added." + CLOSING);
     }
 
+    /** Deletes task from list*/
     public static void deleteTask(Task task) {
         String description = task.getDescription();
         int listNum = tasks.indexOf(task) + 1;
@@ -239,14 +236,59 @@ public class Green {
         System.out.println(LOGO);
         System.out.println(GREETINGS);
 
-        String tempFile = "./temp/tempList.txt";
-
-        Path pathGreen = Paths.get("./data/green.txt");
-        Path pathTemp = Paths.get(tempFile);
+        Path pathList = Paths.get("./data/list.txt");
+        Path parentDir = pathList.getParent();
         try {
-            Files.copy(pathGreen, pathTemp, REPLACE_EXISTING);
+            if (parentDir != null) {
+                boolean parentDirExists = Files.exists(parentDir);
+                if (!parentDirExists) {
+                    System.out.print(OPENING);
+                    System.out.println("data/ does not exist.");
+                    Files.createDirectories(parentDir);
+                    System.out.println("data/ created." + CLOSING);
+                }
+
+                boolean fileExists = Files.exists(pathList);
+                if (!fileExists) {
+                    System.out.print(OPENING);
+                    System.out.println("list.txt does not exist.");
+                    Files.createFile(pathList);
+                    System.out.println("list.txt created." + CLOSING);
+                }
+            } else {
+                System.out.println(OPENING + "Path does not have a parent." + CLOSING);
+            }
+
         } catch (IOException e) {
-            System.out.println(OPENING + "Copying green.txt to temp file went wrong: " + e.getMessage()
+            System.out.println(OPENING +
+                    "Failed to create directory(ies)/file for list.txt: " + e.getMessage()
+                    + CLOSING);
+        }
+
+        String tempFile = "./temp/temp.txt";
+        Path pathTemp = Paths.get(tempFile);
+        Path parentTempDir = pathTemp.getParent();
+        try {
+            if (parentTempDir != null) {
+                boolean parentTempDirExists = Files.exists(parentTempDir);
+                if (!parentTempDirExists) {
+                    System.out.print(OPENING);
+                    System.out.println("temp/ does not exist.");
+                    Files.createDirectories(parentTempDir);
+                    System.out.println("temp/ created." + CLOSING);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println(OPENING
+                    + "Failed to create directory(ies) for temp.txt: " + e.getMessage()
+                    + CLOSING);
+        }
+
+        try {
+            Files.copy(pathList, pathTemp, REPLACE_EXISTING);
+        } catch (IOException e) {
+            System.out.println(OPENING
+                    + "Copying list.txt to temp.txt went wrong: " + e.getMessage()
                     + CLOSING);
         }
 
@@ -290,15 +332,11 @@ public class Green {
             case "event":
                 addTask(task);
 
-                String textToAppend = null;
-                if (task != null) {
-                    textToAppend = task.stringToFile();
-                }
-
                 try {
-                    appendToFile(tempFile,textToAppend);
+                    writeToFile(tempFile);
                 } catch (IOException e) {
-                    System.out.println(OPENING + "Appending went wrong: " + e.getMessage() + CLOSING);
+                    System.out.println(OPENING + "Writing to file went wrong after adding task: "
+                            + e.getMessage() + CLOSING);
                 }
                 break;
             case "delete":
@@ -307,7 +345,7 @@ public class Green {
                 try {
                     writeToFile(tempFile);
                 } catch (IOException e) {
-                    System.out.println(OPENING + "Writing after deletion went wrong: "
+                    System.out.println(OPENING + "Writing to file went wrong after deletion: "
                             + e.getMessage() + CLOSING);
                 }
                 break;
@@ -318,7 +356,7 @@ public class Green {
                 try {
                     writeToFile(tempFile);
                 } catch (IOException e) {
-                    System.out.println(OPENING + "Writing after changing task status went wrong: "
+                    System.out.println(OPENING + "Writing to file went wrong after changing task status: "
                             + e.getMessage() + CLOSING);
                 }
                 break;
@@ -328,9 +366,9 @@ public class Green {
             case "bye":
                 System.out.println(OPENING + "Goodbye, have a nice day." + CLOSING);
                 try {
-                    Files.copy(pathTemp, pathGreen, REPLACE_EXISTING);
+                    Files.copy(pathTemp, pathList, REPLACE_EXISTING);
                 } catch (IOException e) {
-                    System.out.println(OPENING + "Copying temp file to green.txt went wrong: " + e.getMessage()
+                    System.out.println(OPENING + "Copying temp.txt to list.txt went wrong: " + e.getMessage()
                             + CLOSING);
                     break;
                 }

@@ -29,7 +29,7 @@ public class Task {
 
     public String getStatusIcon() {
         if (isDone) {
-            return "✓";
+            return "/";
         } else {
             return " ";
         }
