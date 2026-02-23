@@ -255,9 +255,9 @@ public class Ski {
                 boolean fileExists = Files.exists(pathList);
                 if (!fileExists) {
                     System.out.print(OPENING);
-                    System.out.println("list.txt does not exist.");
+                    System.out.println("data/list.txt does not exist.");
                     Files.createFile(pathList);
-                    System.out.println("list.txt created." + CLOSING);
+                    System.out.println("data/list.txt created." + CLOSING);
                 }
             } else {
                 System.out.println(OPENING + "Path does not have a parent." + CLOSING);
